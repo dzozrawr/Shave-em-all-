@@ -28,26 +28,19 @@ public class CutWool : MonoBehaviour
             hits= Physics.RaycastAll(ray, Mathf.Infinity);
             if (hits != null)
             {
-                Debug.Log("number of hits="+hits.Length);
+                //Debug.Log("number of hits="+hits.Length);
                 foreach (RaycastHit hit in hits)
                 {
                     Transform objectHit = hit.transform;
                     if (objectHit.CompareTag("Wool"))
                     {
+                        if(objectHit.GetComponent<Rigidbody>().isKinematic) CuttingProgress.removeCuttingElement();
                         objectHit.GetComponent<Rigidbody>().isKinematic = false;
-                        Handheld.Vibrate();
+                        
+                        // Handheld.Vibrate();
                         // if(vibrate.hasVibrator()) vibrate.vibrate(200);
 
                     }
-
-
-                    /*                if (objectHit.CompareTag("Wool"))
-                                    {
-                                        objectHit.GetComponent<Rigidbody>().isKinematic = false;
-                                        Handheld.Vibrate();
-                                       // if(vibrate.hasVibrator()) vibrate.vibrate(200);
-
-                                    }*/
 
                 }
             }
