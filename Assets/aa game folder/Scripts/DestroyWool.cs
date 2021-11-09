@@ -8,8 +8,7 @@ public class DestroyWool : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       // Time.cu
-       // Time.deltaTime;
+
     }
 
     // Update is called once per frame

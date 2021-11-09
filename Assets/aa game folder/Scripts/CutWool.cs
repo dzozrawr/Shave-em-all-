@@ -5,8 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class CutWool : MonoBehaviour
 {
-    public Camera camera;
+    public CuttingProgress cuttingProgress;
+    public Camera mainCamera;
     private Vibrate vibrate;
+
+           //maybe some of these should be [SerializedField] private
     // Start is called before the first frame update
     void Start()
     {
@@ -24,7 +27,7 @@ public class CutWool : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             RaycastHit[] hits=null;
-            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             hits= Physics.RaycastAll(ray, Mathf.Infinity);
             if (hits != null)
             {
@@ -34,7 +37,7 @@ public class CutWool : MonoBehaviour
                     Transform objectHit = hit.transform;
                     if (objectHit.CompareTag("Wool"))
                     {
-                        if(objectHit.GetComponent<Rigidbody>().isKinematic) CuttingProgress.removeCuttingElement();
+                        if(objectHit.GetComponent<Rigidbody>().isKinematic) cuttingProgress.removeCuttingElement();
                         objectHit.GetComponent<Rigidbody>().isKinematic = false;
                         
                         // Handheld.Vibrate();

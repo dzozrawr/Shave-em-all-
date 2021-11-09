@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 526b4323e10ca0141a8480900192d279, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneToLoadName: Game
+  sceneToLoadName: Sheep
   timeToWaitBeforeLoadingScene: 0.1
 --- !u!4 &811569117
 Transform:
