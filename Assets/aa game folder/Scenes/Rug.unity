@@ -684,7 +684,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.32, y: 0, z: -25.14}
+  m_LocalPosition: {x: -1.32, y: 3.14, z: -25.14}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1024,8 +1024,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1145215886}
-  - component: {fileID: 1145215885}
   - component: {fileID: 1145215887}
+  - component: {fileID: 1145215885}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -1042,7 +1042,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1145215884}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e68b0320b6fb86a42baf9f1fdc4f02e2, type: 3}
+  m_Script: {fileID: 11500000, guid: 730e97496906da448b2f51b26b4f8cd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cuttingProgress: {fileID: 1145215887}

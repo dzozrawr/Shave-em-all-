@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5840282030797120054}
   - component: {fileID: -3432500594710182444}
   - component: {fileID: 6219462765406481371}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Rug_Fluff_1
   m_TagString: Wool
   m_Icon: {fileID: 0}

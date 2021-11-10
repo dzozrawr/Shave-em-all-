@@ -45,7 +45,7 @@ public class RugGeneration : MonoBehaviour
 
             // go.transform.localScale *= Random.Range(0.75f, 1.5f);
 
-            go.GetComponent<Rigidbody>().AddForce(normal*100);
+            
         }
     }
 }
