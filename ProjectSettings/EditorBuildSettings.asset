@@ -6,9 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/aa game folder/Scenes/QuickSetupScene.unity
+    path: Assets/_Game/Scenes/QuickSetupScene.unity
     guid: c06645b5aa96c124da0dd26468b5894c
   - enabled: 1
-    path: Assets/aa game folder/Scenes/Sheep.unity
+    path: Assets/_Game/Scenes/Sheep.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects: {}

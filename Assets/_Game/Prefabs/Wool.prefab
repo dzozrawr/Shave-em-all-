@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8505432383931916754}
   - component: {fileID: 7046101593770376528}
   - component: {fileID: 7046101593770376531}
-  - component: {fileID: -6473936152456967802}
+  - component: {fileID: 2090500687951180347}
   m_Layer: 0
   m_Name: Wool
   m_TagString: Wool
@@ -114,7 +114,7 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 2540817853737639666, guid: d4903588acd58b542bc1abbf0b4d129b, type: 3}
---- !u!114 &-6473936152456967802
+--- !u!114 &2090500687951180347
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -123,6 +123,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 7856988874016423943}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61fc286ade8c85a4382fe6e6b485d2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 2a48243a5f9a8e643a947fee2cddd471, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
