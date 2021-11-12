@@ -8,6 +8,7 @@ public class CutWool : MonoBehaviour
     public CuttingProgress cuttingProgress;
     public Camera mainCamera;
     private Vibrate vibrate;
+    private bool hitSheep = false;
 
            //maybe some of these should be [SerializedField] private
     // Start is called before the first frame update
@@ -29,15 +30,17 @@ public class CutWool : MonoBehaviour
             RaycastHit[] hits=null;
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             hits= Physics.RaycastAll(ray, Mathf.Infinity);
+            hitSheep = false;
             if (hits != null)
             {
                 //Debug.Log("number of hits="+hits.Length);
                 foreach (RaycastHit hit in hits)
                 {
                     Transform objectHit = hit.transform;
-                    if (objectHit.CompareTag("Wool"))
+                    if (objectHit.CompareTag("Wool")&& objectHit.GetComponent<Rigidbody>().isKinematic)
                     {
-                        if(objectHit.GetComponent<Rigidbody>().isKinematic) cuttingProgress.removeCuttingElement();
+
+                        cuttingProgress.removeCuttingElement();
                         objectHit.GetComponent<Rigidbody>().isKinematic = false;
                         
                         // Handheld.Vibrate();
@@ -45,12 +48,24 @@ public class CutWool : MonoBehaviour
 
                     }
 
+                    if (objectHit.CompareTag("Sheep"))
+                    {
+                        hitSheep = true;
+                        SoundManager.StopLoopingSound("shaverOn");
+                        SoundManager.PlayLoopingSound("shaverAction");
+                    }
+
                 }
+            }
+            if (!hitSheep)
+            {
+                SoundManager.StopLoopingSound("shaverAction");
+                SoundManager.PlayLoopingSound("shaverOn");
             }
         }
         else
         {
-            //vibrate.cancel();
+            SoundManager.StopLoopingSound();
         }
     }
 

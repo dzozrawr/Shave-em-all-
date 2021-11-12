@@ -1,0 +1,405 @@
+﻿#pragma kernel PhysicStep
+#pragma kernel RenderingStep
+
+#include "HairStudio_Math.cginc"
+
+struct ColliderInfo
+{
+	float3 pos;
+	float radius;
+};
+
+struct Strand
+{
+	int firstSegmentIndex;
+	int nbSegments;
+	float4 localRotation;
+};
+
+struct Segment
+{
+	int canMove;
+    float rate;
+	float previousDeltaTime;
+	float length;
+	float3 pos;
+	float3 previousPos;
+	float3 initialPos;
+	float3 arbitraryUp;
+	float4 frame;
+	float4 localRestRotation; 
+};
+
+struct SegmentForShading
+{
+    float3 pos;
+	float3 frame;
+	float3 tangent;
+    float3 up;
+};
+
+RWStructuredBuffer<Strand> _Strands;
+RWStructuredBuffer<Segment> _Segments;
+RWStructuredBuffer<SegmentForShading> _SegmentsForShading;
+RWStructuredBuffer<ColliderInfo> _ColliderInfos;
+RWStructuredBuffer<int4> _VelocityGrid;
+RWStructuredBuffer<int> _DensityGrid;
+
+// grid
+float _VoxelSize;
+int _GridResolution;
+float3 _Center;
+
+// physics
+float3 _ScalpPosition, _ScalpScale, _Force;
+float4 _ScalpRotation;
+float _DeltaTime, _Gravity, _Drag, _Radius, _LocalStiffness, _GlobalStiffnessStart, _GlobalStiffnessEnd, _Friction, _Repulsion;
+int _LengthIterationCount, _StiffnessIterationCount, _FirstStrandIndex, _FirstSegmentIndex, _StrandCount;
+
+float3 GetGridCoord(float3 pos)
+{
+    float3 localPos = pos - _Center;
+	float3 gridCoord = floor(localPos / _VoxelSize);
+	return gridCoord + (float) _GridResolution * 0.5f;
+}
+
+int GetGridIndex(float3 pos)
+{
+    float3 coord = GetGridCoord(pos);
+	return coord.x * square(_GridResolution) + coord.y * _GridResolution + coord.z;
+}
+
+float3 GetVoxel(float3 pos)
+{
+    float3 coord = GetGridCoord(pos);
+	return (coord - (float) _GridResolution * 0.5f) * _VoxelSize + _Center;
+}
+
+// Apply length constraint using Dynamic Follow The Leader
+// as described in paper Fast Simulation of Inextensible Hair and Fur
+void ApplyLengthConstraintDFTL(Strand strand)
+{
+	int segIndex = strand.firstSegmentIndex + _FirstSegmentIndex;
+	for (int j = 1; j < strand.nbSegments; j++)
+    {
+		Segment previous = _Segments[segIndex + j - 1];
+		Segment seg = _Segments[segIndex + j];
+
+        float3 dir = normalize(seg.pos - previous.pos);
+
+        float3 savedPos = seg.pos;
+            
+		// position is set at the exact distance from previous, to ensure inextensibility
+		_Segments[segIndex + j].pos = previous.pos + dir * previous.length;
+
+		// we apply a velocity correction to i using i + 1 projection, relying on position based dynamics
+		_Segments[segIndex + j - 1].previousPos += _Segments[segIndex + j].pos - savedPos;
+	}
+	}
+
+// Apply length constraint using Position Based Dynamics
+void ApplyLengthConstraintMultiplePBD(Strand strand)
+{
+	int segIndex = strand.firstSegmentIndex + _FirstSegmentIndex;
+    for (int i = 0; i < _LengthIterationCount; i++)
+    {
+		for (int j = 0; j < strand.nbSegments - 1; j++)
+        {
+			Segment seg = _Segments[segIndex + j];
+			Segment next = _Segments[segIndex + j + 1];
+
+            float3 toNext = next.pos - seg.pos;
+            float currentDist = length(toNext);
+			float error = (currentDist - seg.length) / currentDist;
+            if (seg.canMove && next.canMove)
+            {
+				_Segments[segIndex + j].pos += error * 0.5f * toNext;
+				_Segments[segIndex + j + 1].pos -= error * 0.5f * toNext;
+			}
+            else if (seg.canMove)
+            {
+				_Segments[segIndex + j].pos += error * toNext;
+			}
+            else if (next.canMove)
+            {
+				_Segments[segIndex + j + 1].pos -= error * toNext;
+			}
+        }
+    }
+}
+
+void ManageCollisions(Strand strand)
+{
+	int segIndex = strand.firstSegmentIndex + _FirstSegmentIndex;
+	// colliders depenetration
+	for (int j = 1; j < strand.nbSegments; j++)
+	{
+		Segment seg = _Segments[segIndex + j];
+		uint colliderCount, stride;
+		_ColliderInfos.GetDimensions(colliderCount, stride);
+		bool collision = false;
+		for (uint c = 0; c < colliderCount; c++)
+		{
+			ColliderInfo ci = _ColliderInfos[c];
+			float3 colToSeg = seg.pos - ci.pos;
+			float radii = _Radius + ci.radius;
+			if (SqrLength(colToSeg) < square(radii))
+			{
+				// collision detected
+				float penetration = radii - length(colToSeg);
+				seg.pos += normalize(colToSeg) * penetration;
+				collision = true;
+			}
+		}
+		if (collision)
+		{
+			// if segment collide, its energy is absorbed by the collider and velocity is canceled
+			seg.previousPos = seg.pos;
+			_Segments[segIndex + j] = seg;
+		}
+	}
+}
+
+void ApplyLocalStiffness(Strand strand)
+{
+	//if (strand.nbSegments == 0)
+	//	return;
+	int segIndex = strand.firstSegmentIndex + _FirstSegmentIndex;
+
+	// updating the frame of the first segment
+	_Segments[segIndex].frame = MultQQ(_ScalpRotation, strand.localRotation);
+
+	//float stiffnessPerIteration = _LocalStiffness / ((float) _StiffnessIterationCount);
+	for (int i = 0; i < _StiffnessIterationCount; i++)
+	{
+		for (int j = 0; j < strand.nbSegments - 1; j++)
+		{
+			Segment seg = _Segments[segIndex + j];
+			Segment next = _Segments[segIndex + j + 1];
+
+			// we find the ideal position for next segment
+			float4 restRotation = MultQQ(seg.frame, seg.localRestRotation);
+			float3 localIdealPosition = MultQV(restRotation, _forward) * seg.length;
+			float3 idealPos = seg.pos + localIdealPosition;
+
+			float3 delta = idealPos - next.pos;
+			// TODO stiffness should be scaled with delta, to get more stiffness on large delta.
+			delta *= _LocalStiffness;
+
+			// we apply the delta between this node and the next, to fasten convergence
+			if (seg.canMove && next.canMove)
+			{
+				seg.pos -= delta * 0.5f;
+				next.pos += delta * 0.5f; 
+			}
+			else if (seg.canMove)
+			{
+				seg.pos -= delta;
+			}
+			else if (next.canMove)
+			{
+				next.pos += delta;
+			}
+
+			if (j != 0)
+			{
+				Segment previous = _Segments[segIndex + j - 1];
+				seg.frame = QuaternionLookAt(seg.pos - previous.pos, previous.arbitraryUp);
+			}
+			next.frame = QuaternionLookAt(next.pos - seg.pos, seg.arbitraryUp);
+			_Segments[segIndex + j] = seg;
+			_Segments[segIndex + j + 1] = next;
+		}
+	}
+}
+
+void IntegrateLocal(Strand strand)
+{
+	int segIndex = strand.firstSegmentIndex + _FirstSegmentIndex;
+	for (int j = 0; j < strand.nbSegments; j++)
+	{
+		Segment seg = _Segments[segIndex + j];
+
+		float3 initialPos = _ScalpPosition + MultQV(_ScalpRotation, seg.initialPos * _ScalpScale);
+		if (seg.canMove == 0 || seg.rate <= _GlobalStiffnessStart)
+		{
+			_Segments[segIndex + j].pos = initialPos;
+		}
+		else
+		{
+			// integration of velocity, gravity, force and drag
+			float3 velocity = seg.pos - seg.previousPos;
+			_Segments[segIndex + j].previousPos = seg.pos;
+
+			// external force
+			velocity += _Force;
+		
+			// gravity
+			velocity += _up * _Gravity * _DeltaTime;
+
+			// friction
+			if (_Friction != 0)
+			{
+				int velocityCount = _VelocityGrid[GetGridIndex(seg.pos)].w;
+				if (velocityCount > 0)
+				{
+					float3 voxelVelocity = float3(_VelocityGrid[GetGridIndex(seg.pos)].xyz) / 10000.0;
+					voxelVelocity /= float(velocityCount);
+					velocity = (1 - _Friction) * velocity + _Friction * voxelVelocity;
+				}
+			}
+		
+			// drag
+			velocity *= 1 - _Drag * _DeltaTime;
+		
+			// hair/hair repulsion
+			if (_Repulsion != 0)
+			{
+				float3 baseVoxel = GetVoxel(seg.pos);
+				float3 repulsion;
+				for (float x = 0; x <= _VoxelSize + _VoxelSize / 2; x += _VoxelSize)
+					for (float y = 0; y <= _VoxelSize + _VoxelSize / 2; y += _VoxelSize)
+						for (float z = 0; z <= _VoxelSize + _VoxelSize / 2; z += _VoxelSize)
+						{
+							float3 voxel = baseVoxel + float3(x, y, z);
+							float3 voxelToSeg = seg.pos - voxel;
+							float voxelToSegVolume = abs(voxelToSeg.x * voxelToSeg.y * voxelToSeg.z);
+							float voxelVolume = _VoxelSize * _VoxelSize * _VoxelSize;
+							float weight = 1 - voxelToSegVolume / voxelVolume;
+					
+							int index = GetGridIndex(seg.pos + float3(x, y, z));
+							float density = float(_DensityGrid[index]) * 0.000001;
+							repulsion += normalize(voxelToSeg) * weight * density;
+						}
+				if (any(repulsion))
+					velocity += normalize(repulsion) * _Repulsion * 0.0001 * _DeltaTime;
+			}
+
+			// application of the final velocity
+			_Segments[segIndex + j].pos += velocity;
+
+			// global stiffness
+			if (seg.rate <= _GlobalStiffnessEnd)
+			{
+				float stiffnessRate = 1 - saturate(invLerp(_GlobalStiffnessStart, _GlobalStiffnessEnd, seg.rate));
+				stiffnessRate = max(stiffnessRate, 0.01f);
+				float3 delta = (initialPos - _Segments[segIndex + j].pos).xyz * stiffnessRate;
+				_Segments[segIndex + j].pos += delta;
+			}
+		}
+	}
+}
+
+[numthreads(64, 1, 1)]
+void PhysicStep(uint GIndex : SV_GroupIndex, uint3 GId : SV_GroupID)
+{
+	uint index = GIndex + GId.x * 64;
+	uint numStrands, stride;
+	_Strands.GetDimensions(numStrands, stride); 
+	if (index >= _FirstStrandIndex + _StrandCount)
+		return;
+	
+	Strand strand = _Strands[_FirstStrandIndex + index];
+
+	// register on the cohesion map
+	if (_Friction != 0 || _Repulsion != 0)
+	{
+		uint segIndex = strand.firstSegmentIndex + _FirstSegmentIndex;
+		for (int j = 0; j < strand.nbSegments; j++)
+		{
+			Segment seg = _Segments[segIndex + j];
+			if (j == 0)
+				continue;
+			for (float x = 0; x <= _VoxelSize + epsilon; x += _VoxelSize)
+				for (float y = 0; y <= _VoxelSize + epsilon; y += _VoxelSize)
+					for (float z = 0; z <= _VoxelSize + epsilon; z += _VoxelSize)
+					{
+						float3 voxel = GetVoxel(seg.pos + float3(x, y, z));
+						float3 voxelToSeg = seg.pos - voxel;
+						float voxelToSegVolume = abs(voxelToSeg.x * voxelToSeg.y * voxelToSeg.z);
+						float voxelVolume = _VoxelSize * _VoxelSize * _VoxelSize;
+						float weight = 1 - voxelToSegVolume / voxelVolume;
+						int index = GetGridIndex(seg.pos + float3(x, y, z));
+					
+						if (_Repulsion != 0)
+						{
+							InterlockedAdd(_DensityGrid[index], (int) (weight * 100000));
+						}
+					
+						if (_Friction != 0)
+						{
+							float3 velocity = seg.pos - seg.previousPos;
+							InterlockedAdd(_VelocityGrid[index].x, (int) (velocity.x * weight * 10000));
+							InterlockedAdd(_VelocityGrid[index].y, (int) (velocity.y * weight * 10000));
+							InterlockedAdd(_VelocityGrid[index].z, (int) (velocity.z * weight * 10000));
+							InterlockedAdd(_VelocityGrid[index].w, 1);
+						}
+					}
+		}
+	}
+	
+	IntegrateLocal(strand);
+
+	//ApplyLengthConstraintDFTL(strand);
+	ApplyLengthConstraintMultiplePBD(strand);
+	
+	if (_GlobalStiffnessStart >= 1)
+		return;
+
+	ApplyLocalStiffness(strand);
+
+	ManageCollisions(strand);
+}
+
+[numthreads(64, 1, 1)]
+void RenderingStep(uint GIndex : SV_GroupIndex, uint3 GId : SV_GroupID)
+{
+	uint index = GIndex + GId.x * 64;
+	uint numStrands, stride;
+	_Strands.GetDimensions(numStrands, stride);
+	if (index >= _FirstStrandIndex + _StrandCount)
+		return;
+	Strand strand = _Strands[_FirstStrandIndex + index];
+
+	// move the fixed segments according to scalp new transform
+	uint segIndex = strand.firstSegmentIndex + _FirstSegmentIndex;
+	for (int j = 0; j < strand.nbSegments; j++)
+	{
+		Segment seg = _Segments[segIndex + j];
+		if (seg.canMove == 0 || seg.rate <= _GlobalStiffnessStart)
+		{
+			float3 initialPos = _ScalpPosition + MultQV(_ScalpRotation, seg.initialPos * _ScalpScale);
+			_Segments[segIndex + j].pos = initialPos;
+		}
+	}
+
+	// depenetrate
+	ManageCollisions(strand); 
+	
+	// prepare segments for shading 
+	for (j = 0; j < strand.nbSegments; j++)
+	{
+		Segment seg = _Segments[segIndex + j];
+		float3 tangent;
+		if (j == strand.nbSegments - 1)
+		{
+			// this is the last segment. The tangent is set as the same as the previous segment
+			tangent = _SegmentsForShading[segIndex + j - 1].tangent;
+		}
+		else
+		{
+			Segment next = _Segments[segIndex + j + 1];
+			float3 toNext = next.pos - seg.pos;
+			_Segments[segIndex + j + 1].frame = QuaternionLookAt(toNext, seg.arbitraryUp);
+			tangent = normalize(toNext);
+		}
+		_SegmentsForShading[segIndex + j].frame = MultQV(seg.frame, float3(0, 0, 1));
+		_SegmentsForShading[segIndex + j].tangent = tangent;
+		_SegmentsForShading[segIndex + j].pos = seg.pos;
+		_SegmentsForShading[segIndex + j].up = seg.arbitraryUp;
+	}
+}
+
+
+
+

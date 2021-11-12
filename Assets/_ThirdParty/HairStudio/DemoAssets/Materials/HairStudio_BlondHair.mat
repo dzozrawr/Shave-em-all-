@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: HairStudio_BlondHair
+  m_Shader: {fileID: 4800000, guid: 78db98c640c1a0045a4e22202b033bfe, type: 3}
+  m_ShaderKeywords: _REALISTIC_ON _SHOWM_ON _SHOWN_ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HairColorTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HairSpecularTexEx1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HairSpecularTexEx2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RandomTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _AlphaR: -9
+    - _AlphaTRT: -20
+    - _AlphaTT: -20
+    - _BetaR: 10.5
+    - _BetaTRT: 0
+    - _BetaTT: 0
+    - _BumpScale: 1
+    - _ColorNuance: 0
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
+    - _Eccentricity: 0.1
+    - _GammaG: 5
+    - _GammaTT: 5
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _HairColorNuance: 0
+    - _HairWidth: 0.0005
+    - _HairWidthMultiplier: 0.272
+    - _Metallic: 0
+    - _Mode: 0
+    - _Nuance: 0.05
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _PhiG: 11.7
+    - _RandomMultiplicator: 0
+    - _ScaleD: 0.418
+    - _ScaleG: 0
+    - _ScaleR: 0.18
+    - _ScaleTRT: 0
+    - _ScaleTT: 0
+    - _SelfShadowStrength: 0
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _ThicknessDecreaseRate: 0.7
+    - _ThicknessRoot: 0.0003
+    - _ThicknessTip: 0.0001
+    - _UVSec: 0
+    - _Waviness: 0.1
+    - _WavinessAmp: 0.02
+    - _WavinessFreq: 20
+    - _ZWrite: 1
+    - _alphaR: -6.1
+    - _alphaTRT: 10
+    - _alphaTT: 3.4
+    - _betaR: 9.27
+    - _betaTRT: 2.43
+    - _betaTT: 3.09
+    - _diffuseScale: 0.227
+    - _gammaG: 10.9
+    - _gammaTT: 15.3
+    - _phiG: 20.2
+    - _realistic: 1
+    - _scaleG: 0.174
+    - _scaleR: 0.114
+    - _scaleTRT: 0.114
+    - _scaleTT: 0.74
+    - _showM: 1
+    - _showN: 1
+    - g_MatEx1: 16.9
+    - g_MatEx2: 5.38
+    - g_MatKa: 0.201
+    - g_MatKd: 0.583
+    - g_MatKs1: 0.378
+    - g_MatKs2: 0.147
+    - g_bThinTip: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorD: {r: 1, g: 0.9156863, b: 0.5, a: 1}
+    - _ColorG: {r: 1, g: 0.83137256, b: 0, a: 1}
+    - _ColorR: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorTRT: {r: 1, g: 0.83137256, b: 0, a: 1}
+    - _ColorTT: {r: 1, g: 0.87352943, b: 0.25, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _HairColor: {r: 1, g: 0.8586151, b: 0.4669811, a: 1}
+    - _Roughness: {r: 0.2, g: 0.4, b: 0, a: 0}
+    - _SecondHairColor: {r: 0.3764706, g: 0.16862746, b: 0, a: 1}
+    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _colorG: {r: 1, g: 0.7715039, b: 0.13679248, a: 1}
+    - _colorR: {r: 1, g: 1, b: 1, a: 1}
+    - _colorTRT: {r: 1, g: 0.73529416, b: 0, a: 1}
+    - _colorTT: {r: 1, g: 0.8570588, b: 0.45999998, a: 1}
+    - colorR: {r: 1, g: 1, b: 1, a: 1}

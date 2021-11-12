@@ -36,9 +36,10 @@ public class WoolGeneration : MonoBehaviour
             
             pos = localTransform.TransformPoint(pos);
 
-            pos += normal*0.5f;
+            // pos += normal*0.5f;
 
-            GameObject go = Instantiate(wool, pos, Quaternion.LookRotation(Random.insideUnitSphere));
+              GameObject go = Instantiate(wool, pos, Quaternion.LookRotation(Random.insideUnitSphere));
+           // GameObject go = Instantiate(wool, pos, Quaternion.identity);
             //CuttingProgress.addCuttingElement();
 
             go.transform.localScale *= Random.Range(0.75f, 1.5f);
