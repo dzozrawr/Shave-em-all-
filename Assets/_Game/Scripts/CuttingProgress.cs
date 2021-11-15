@@ -7,10 +7,11 @@ public class CuttingProgress : MonoBehaviour
 {
     private int cuttingElements=-1, cuttingElementsMax;
     public UIController uiController;
+    private GameController gameController;
     // Start is called before the first frame update
     void Start()
     {
-        
+        gameController = gameObject.GetComponent<GameController>(); //requires for the game object to have a GameController script
     }
 
     // Update is called once per frame
@@ -18,8 +19,8 @@ public class CuttingProgress : MonoBehaviour
     {
         if (cuttingElements == 0)
         {
-            uiController.showVictoryMessage();
-            cuttingElements = -1;
+             gameController.Victory();  //also calls uiControllers showVictoryMessage() method
+             cuttingElements = -1;
         }
     }
 

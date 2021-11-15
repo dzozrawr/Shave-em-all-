@@ -10,6 +10,8 @@ public class UIController : MonoBehaviour
 {
     public GameObject victoryUI;
     public Slider progressBar;
+
+
     // Start is called before the first frame update
     void Start()
     {

@@ -37,7 +37,6 @@ public class CutRug : MonoBehaviour
                         objectHit.GetComponent<Rigidbody>().isKinematic = false;
                         Vector3 randDirection = Random.insideUnitSphere;
                         randDirection.z = -Random.Range(0f,1f);
-                        Debug.Log(randDirection);
                         objectHit.GetComponent<Rigidbody>().AddForce(randDirection * 200);
                         objectHit.GetComponent<Rigidbody>().AddTorque(randDirection * 400);
 
