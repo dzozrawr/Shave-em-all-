@@ -11,6 +11,7 @@ public class UIController : MonoBehaviour
     public GameObject victoryUI;
     public Slider progressBar;
 
+    
 
     // Start is called before the first frame update
     void Start()
@@ -32,7 +33,8 @@ public class UIController : MonoBehaviour
 
     public void nextLevel()
     {
-        SceneManager.LoadScene(0);  //should be: buildIndex+1
+        Scene scene;
+        SceneManager.LoadScene("Haircut");  //should be: buildIndex+1
     }
 
 }

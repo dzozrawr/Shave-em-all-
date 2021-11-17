@@ -8,6 +8,7 @@ public class CuttingProgress : MonoBehaviour
     private int cuttingElements=-1, cuttingElementsMax;
     public UIController uiController;
     private GameController gameController;
+    private bool didPlayAngryBaahAtHalfProgress = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,17 +30,30 @@ public class CuttingProgress : MonoBehaviour
         cuttingElements = n;
         cuttingElementsMax = n;
         uiController.progressBar.maxValue = n;
+
     }
 
     public  void addCuttingElement()
     {
         if (cuttingElements == -1) cuttingElements = 1; else cuttingElements++;
-        
+       
+
     }
 
     public  void removeCuttingElement()
     {
         cuttingElements--;
         uiController.progressBar.value = cuttingElementsMax - cuttingElements;
+
+       // Debug.Log(((float)cuttingElements) / ((float)cuttingElementsMax));
+        if (((float)cuttingElements) / ((float)cuttingElementsMax) < 0.5f)
+        {
+            if (!didPlayAngryBaahAtHalfProgress)
+            {
+                didPlayAngryBaahAtHalfProgress = true;
+                gameController.playAngryBaah();
+            }
+
+        }
     }
 }

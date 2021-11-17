@@ -18,6 +18,11 @@ public class DestroyCuttingElem : MonoBehaviour
 
     void OnBecameInvisible()
     {
+        if (gameObject.transform.parent != null) {
+            gameObject.transform.parent.GetComponent<DestroyObject>().selfDestruct();
+            return;
+        }
+
         Destroy(gameObject);
     }
 }

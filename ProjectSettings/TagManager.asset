@@ -7,6 +7,7 @@ TagManager:
   - Wool
   - Sheep
   - Hair
+  - BubbleGum
   layers:
   - Default
   - TransparentFX

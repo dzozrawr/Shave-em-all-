@@ -56,7 +56,7 @@ public class CutHair : MonoBehaviour
     private void makeHairStrandFlyInTheShaverDirection(GameObject strand)
     {
         strand.transform.localScale *= Random.Range(0.5f, 1.25f);
-        Debug.Log(shaver.transform.localRotation.eulerAngles.z);
+       // Debug.Log(shaver.transform.localRotation.eulerAngles.z);
         float angle = shaver.transform.localRotation.eulerAngles.z-90; 
         Vector3 lDirection = new Vector3(Mathf.Cos(Mathf.Deg2Rad * angle),Mathf.Sin(Mathf.Deg2Rad * angle), 0);
         lDirection.z = -Random.Range(0.5f, 1f);

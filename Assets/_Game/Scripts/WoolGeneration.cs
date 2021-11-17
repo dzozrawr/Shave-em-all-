@@ -42,7 +42,7 @@ public class WoolGeneration : MonoBehaviour
            // GameObject go = Instantiate(wool, pos, Quaternion.identity);
             //CuttingProgress.addCuttingElement();
 
-            go.transform.localScale *= Random.Range(0.75f, 1.5f);
+            go.transform.localScale *= Random.Range(1, 1.5f);
           
             //go.GetComponent<Rigidbody>().AddForce(normal*100);
         }

@@ -29,4 +29,9 @@ public class GameController : MonoBehaviour
             isGameOver = true;
         }
     }
+
+    public void playAngryBaah()
+    {
+        shavedObjectAnimator.SetTrigger("TriggerBaah");
+    }
 }

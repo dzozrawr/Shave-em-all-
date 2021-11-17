@@ -48,6 +48,11 @@ public class CutWool : MonoBehaviour
 
                     }
 
+                    if(objectHit.CompareTag("BubbleGum")&& objectHit.GetComponent<Rigidbody>().isKinematic)
+                    {
+                        objectHit.GetComponent<Rigidbody>().isKinematic = false;
+                    }
+
                     if (objectHit.CompareTag("Sheep"))
                     {
                         hitSheep = true;
