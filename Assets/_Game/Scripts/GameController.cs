@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Tabtale.TTPlugins;
 
 public class GameController : MonoBehaviour
 {
@@ -8,6 +9,11 @@ public class GameController : MonoBehaviour
     [SerializeField] private Animator shavedObjectAnimator = null;
 
     private bool isGameOver = false;
+
+    private void Awake()
+    {
+        TTPCore.Setup();
+    }
     // Start is called before the first frame update
     void Start()
     {
