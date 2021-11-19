@@ -5,15 +5,18 @@ using UnityEngine;
 public class SoundManager : MonoBehaviour
 {
     // Start is called before the first frame update
-    public static AudioClip shaverOnSound, shaverActionSound;
-    public static AudioSource audioSrc;
+    public static AudioClip shaverOnSound, shaverActionSound, angryBaahSound;
+    public static AudioSource audioSrc, sheepAudioSrc;
     // Start is called before the first frame update
     void Start()
     {
         shaverOnSound = Resources.Load<AudioClip>("shaverOn");
         shaverActionSound = Resources.Load<AudioClip>("shaverAction");
+        angryBaahSound= Resources.Load<AudioClip>("angryBaah");
 
         audioSrc = GetComponent<AudioSource>();
+       sheepAudioSrc = transform.GetChild(0).GetComponent<AudioSource>();
+        //GetComponent()
     }
 
     public static void PlaySound(string clip)
@@ -27,6 +30,10 @@ public class SoundManager : MonoBehaviour
             case "shaverAction":
                 if (audioSrc.isPlaying) return;
                 audioSrc.PlayOneShot(shaverActionSound);
+                break;
+            case "angryBaah":
+                //if (audioSrc.isPlaying) return;
+                sheepAudioSrc.PlayOneShot(angryBaahSound);
                 break;
         }
     }

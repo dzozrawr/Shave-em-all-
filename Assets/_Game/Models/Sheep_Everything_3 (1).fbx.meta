@@ -93,11 +93,18 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.32829374
+        functionName: playAngryBaahSound
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 453916fca813d1b40a8c0f75d449af4a, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+      additiveReferencePoseFrame: 121
     - serializedVersion: 16
       name: Happy Dance
       takeName: Happy Dance
